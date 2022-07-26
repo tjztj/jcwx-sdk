@@ -96,10 +96,6 @@ class Jcwx
         $key=$this->key;//名称
         $password=$this->password;//密码
         /***************************************************/
-        // Must be exact 32 chars (256 bit)
-        $password = substr(hash('sha256', $password, true), 0, 32);
-        // IV must be exact 16 chars (128 bit)
-        $iv = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
 
         $other['type']=$type;
         $other['nonce']=time();
@@ -113,10 +109,16 @@ class Jcwx
         $params||$params=[];
         $params['__type']=$type;
         $params['__nonce']=$other['nonce'];
-        //缓存2小时
-        \think\facade\Cache::tag('jcwx-sdk-generate-uuid')->set('jcwx-'.$other['uuid'],$params,60*2);
+
+        // Must be exact 32 chars (256 bit)
+        $password = substr(hash('sha256', $password, true), 0, 32);
+        // IV must be exact 16 chars (128 bit)
+        $iv = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
 
         $v=base64_encode(openssl_encrypt(serialize($other), 'AES-128-CBC', $password, OPENSSL_RAW_DATA, $iv));
+
+        //缓存2小时
+        \think\facade\Cache::tag('jcwx-sdk-generate-uuid')->set('jcwx-'.$other['uuid'],$params,60*2);
         return $url.'/index.php?k='.$key.'&v='.urlencode($v);
     }
 
