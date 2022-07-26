@@ -166,7 +166,6 @@ class Jcwx
             \think\facade\Cache::delete('jcwx-'.$uuid);
         }
 
-
         return [
             'res'=>$res,
             'params'=>$params,
