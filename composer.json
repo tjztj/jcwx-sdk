@@ -1,0 +1,21 @@
+{
+    "name": "tj/jcwx-sdk",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "jcwxSdk\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "tj",
+            "email": "1079798840@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "topthink/think-captcha": "^3.0"
+    },
+    "minimum-stability": "stable",
+    "license": "MIT"
+}
