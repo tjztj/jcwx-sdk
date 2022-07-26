@@ -161,6 +161,7 @@ class Jcwx
             throw new \Exception('解析失败-00B');
         }
 
+
         if($once){
             //为了安全只允许访问一次
             \think\facade\Cache::delete('jcwx-'.$uuid);
