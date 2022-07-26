@@ -123,10 +123,11 @@ class Jcwx
 
     /**
      * 解析回调地址中的参数
+     * @param bool $once 为了安全，一个请求只允许访问一次
      * @return array
      * @throws \Exception
      */
-    public function getBackData():array{
+    public function getBackData(bool $once=true):array{
         $uuid=request()->get('uuid');
         if(!$uuid){
             throw new \Exception('缺少参数-00A');
@@ -149,10 +150,20 @@ class Jcwx
         if(!$json){
             throw new \Exception('解析失败-00A');
         }
+        $json=trim($json);
+        if(!$json){
+            throw new \Exception('解析失败-00A1');
+        }
         $res=json_decode($json,true);
         if($res===false){
             throw new \Exception('解析失败-00B');
         }
+
+        if($once){
+            //为了安全只允许访问一次
+            \think\facade\Cache::delete('jcwx-'.$uuid);
+        }
+
 
         return [
             'res'=>$res,
