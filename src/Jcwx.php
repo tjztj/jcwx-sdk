@@ -109,6 +109,7 @@ class Jcwx
         $params||$params=[];
         $params['__type']=$type;
         $params['__nonce']=$other['nonce'];
+        $params['__sid']=session_id();
 
         // Must be exact 32 chars (256 bit)
         $password = substr(hash('sha256', $password, true), 0, 32);
