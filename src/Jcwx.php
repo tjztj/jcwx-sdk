@@ -110,7 +110,6 @@ class Jcwx
         $params||$params=[];
         $params['__type']=$type;
         $params['__nonce']=$other['nonce'];
-        $params['__sid']=\think\facade\Session::getId();
 
         // Must be exact 32 chars (256 bit)
         $password = substr(hash('sha256', $password, true), 0, 32);
@@ -145,10 +144,6 @@ class Jcwx
         if(empty($params)){
             throw new \Exception('请求已过期或请求参数不合法-001');
         }
-        if($params['__sid']!==\think\facade\Session::getId()){
-            throw new \Exception('请求已过期或请求参数不合法-002');
-        }
-        unset($params['__sid']);
 
 
         $iv=substr(md5(chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0)),8,16);
