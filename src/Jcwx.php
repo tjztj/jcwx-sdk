@@ -3,6 +3,8 @@
 namespace jcwxSdk;
 
 
+use think\facade\Session;
+
 /**
  * 中转服务器对象
  */
@@ -109,7 +111,7 @@ class Jcwx
         $params||$params=[];
         $params['__type']=$type;
         $params['__nonce']=$other['nonce'];
-        $params['__sid']=session_id();
+        $params['__sid']=Session::getId();
 
         // Must be exact 32 chars (256 bit)
         $password = substr(hash('sha256', $password, true), 0, 32);
