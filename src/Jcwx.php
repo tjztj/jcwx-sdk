@@ -32,7 +32,7 @@ class Jcwx
      */
     public function __construct(string $url,string $key,string $password)
     {
-        $this->url=$url;
+        $this->url=rtrim($url,'/');
         $this->key=$key;
         $this->password=$password;
     }
