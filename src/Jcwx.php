@@ -143,8 +143,12 @@ class Jcwx
 
         $params= \think\facade\Cache::get('jcwx-'.$uuid);
         if(empty($params)){
-            throw new \Exception('请求已过期或请求参数不合法');
+            throw new \Exception('请求已过期或请求参数不合法-001');
         }
+        if($params['__sid']!==\think\facade\Session::getId()){
+            throw new \Exception('请求已过期或请求参数不合法-002');
+        }
+        unset($params['__sid']);
 
 
         $iv=substr(md5(chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0)),8,16);
