@@ -92,7 +92,7 @@ class Jcwx
 
 
 
-    private function generateUrl(string $type,array $other=[],array $params=null):string{
+    public function generateUrl(string $type,array $other=[],array $params=null):string{
         $url=$this->url;//域名
         $key=$this->key;//名称
         $password=$this->password;//密码
