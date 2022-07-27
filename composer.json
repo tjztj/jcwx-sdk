@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=7.4.0",
-        "topthink/think-captcha": "^3.0"
+        "topthink/framework": "^6.0"
     },
     "minimum-stability": "stable",
     "license": "MIT"
