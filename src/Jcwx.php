@@ -91,6 +91,19 @@ class Jcwx
     }
 
 
+    /**
+     * 获取微信用户openid
+     * @param string $callbackUrl
+     * @param array|null $params
+     * @return string
+     */
+    public function generateOpenIdUrl(string $callbackUrl,array $params=null):string{
+        return $this->generateUrl('GetOpenId',[
+            'callback_url'=>$callbackUrl,
+        ],$params);
+    }
+
+
 
     public function generateUrl(string $type,array $other=[],array $params=null):string{
         $url=$this->url;//域名
@@ -119,7 +132,7 @@ class Jcwx
         $v=base64_encode(openssl_encrypt(serialize($other), 'AES-128-CBC', $password, OPENSSL_RAW_DATA, $iv));
 
         //缓存2小时
-        \think\facade\Cache::tag('jcwx-sdk-generate-uuid')->set('jcwx-'.$other['uuid'],$params,60*2);
+        \think\facade\Cache::tag('jcwx-sdk-generate-uuid')->set('jcwx-'.$other['uuid'],$params,60*60*2);
         return $url.'/index.php?k='.$key.'&v='.urlencode($v);
     }
 
@@ -150,15 +163,39 @@ class Jcwx
         $ik=substr(md5(hash('sha256', $params['__type'].$params['__nonce'])),8,16);
 
         $json=openssl_decrypt($str, 'AES-128-CBC', $ik, OPENSSL_ZERO_PADDING ,$iv);
+        $json||$json=openssl_decrypt(base64_decode($str)?:'', 'AES-128-CBC', $ik, OPENSSL_ZERO_PADDING ,$iv);
+        $json||$json=openssl_decrypt(base64_decode($str)?:'', 'AES-128-CBC', $ik, OPENSSL_RAW_DATA ,$iv);
+        $json||$json=openssl_decrypt(base64_decode($str)?:'', 'AES-128-CBC', substr(hash('sha256', $this->password, true), 0, 32), OPENSSL_RAW_DATA ,chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0));
         if(!$json){
             throw new \Exception('解析失败-00A');
         }
+
+        //去除生成的特殊符号(16进制的符号)
         $json=trim($json);
+
+
+        $str=strpos($json,'{');
+        $end=strpos($json,'}');
+        $str2=strpos($json,'[');
+        $end2=strpos($json,']');
+        if($str===0){
+            $json=mb_substr($json,$str,$end+1);
+        }else if($str!==false&&$str2!==false){
+            if($str>$str2){
+                $json=mb_substr($json,$str2,$end2+1);
+            }else{
+                $json=mb_substr($json,$str,$end+1);
+            }
+        }else if($str===false&&$str2!==false){
+            $json=mb_substr($json,$str2,$end2+1);
+        }
+
         if(!$json){
             throw new \Exception('解析失败-00A1');
         }
+
         $res=json_decode($json,true);
-        if($res===false){
+        if($res===null){
             throw new \Exception('解析失败-00B');
         }
 
