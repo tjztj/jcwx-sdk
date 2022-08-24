@@ -146,16 +146,19 @@ class Jcwx
     public function getBackData(bool $once=true):array{
         $uuid=request()->get('uuid');
         if(!$uuid){
-            throw new \Exception('缺少参数-00A');
+            throw new \Exception('缺少参数-00A',400);
         }
         $str=request()->get('res');
         if(!$str){
-            throw new \Exception('缺少参数-00B');
+            throw new \Exception('缺少参数-00B',400);
         }
 
         $params= \think\facade\Cache::get('jcwx-'.$uuid);
         if(empty($params)){
-            throw new \Exception('请求已过期或请求参数不合法-001');
+            if(\think\facade\Cache::get('jcwx-rm-'.$uuid)){
+                throw new \Exception('请求已过期',40317);
+            }
+            throw new \Exception('请求参数不合法-001',40316);
         }
 
 
@@ -167,7 +170,7 @@ class Jcwx
         $json||$json=openssl_decrypt(base64_decode($str)?:'', 'AES-128-CBC', $ik, OPENSSL_RAW_DATA ,$iv);
         $json||$json=openssl_decrypt(base64_decode($str)?:'', 'AES-128-CBC', substr(hash('sha256', $this->password, true), 0, 32), OPENSSL_RAW_DATA ,chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0));
         if(!$json){
-            throw new \Exception('解析失败-00A');
+            throw new \Exception('解析失败-00A',500100);
         }
 
         //去除生成的特殊符号(16进制的符号)
@@ -191,18 +194,19 @@ class Jcwx
         }
 
         if(!$json){
-            throw new \Exception('解析失败-00A1');
+            throw new \Exception('解析失败-00A1',500100);
         }
 
         $res=json_decode($json,true);
         if($res===null){
-            throw new \Exception('解析失败-00B');
+            throw new \Exception('解析失败-00B',500100);
         }
 
 
         if($once){
             //为了安全只允许访问一次
             \think\facade\Cache::delete('jcwx-'.$uuid);
+            \think\facade\Cache::tag('jcwx-sdk-generate-uuid')->set('jcwx-rm-'.$uuid,time(),60*60*24*365);
         }
 
 
