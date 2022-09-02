@@ -70,7 +70,7 @@ class Jcwx
      * @return string
      */
     public function generateRecordDownUrl(string $path):string{
-        return $this->generateUrl('Scan',[
+        return $this->generateUrl('Record',[
             'method'=>'down',
             'path'=>$path,
         ]);
